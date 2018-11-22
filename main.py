@@ -2,17 +2,17 @@ from vision_project.data_loader import DataLoader
 import tensorflow as tf, time
 
 dl = DataLoader('/home/ceteke/Documents/datasets/img_align_celeba', n_dataset=1)
-# dl.prepare_images()
-#
-tic = time.time()
-dl.load_dataset()
-toc = time.time()
-#
-dataset = dl.dataset.batch(64)
 
-iterator = dataset.make_one_shot_iterator()
+dataset = dl.load_dataset(64)
+iterator = dataset.make_initializable_iterator()
 next_element = iterator.get_next()
-with tf.Session() as sess:
-    print(sess.run(next_element))
 
-print(toc-tic)
+sess = tf.Session()
+
+for e in range(100):
+    sess.run(iterator.initializer)
+    while True:
+        try:
+            print(sess.run(next_element).shape)
+        except tf.errors.OutOfRangeError:
+            break
