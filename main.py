@@ -1,7 +1,7 @@
 from vision_project.data_loader import DataLoader
 import tensorflow as tf, time
 
-dl = DataLoader('/home/ceteke/Documents/datasets/img_align_celeba', n_dataset=1)
+dl = DataLoader('/home/ceteke/Documents/datasets/img_align_celeba')
 
 dataset = dl.load_dataset(64)
 iterator = dataset.make_initializable_iterator()

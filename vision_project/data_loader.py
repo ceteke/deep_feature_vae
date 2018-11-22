@@ -1,22 +1,8 @@
 import os, tensorflow as tf
 
 class DataLoader(object):
-    def __init__(self, base_dir, n_dataset=20):
+    def __init__(self, base_dir):
         self.base_dir = base_dir
-        self.image_shape = [218, 178, 3]
-        self.tf_record_prefix = 'data'
-        self.n_dataset = n_dataset
-
-    def parser(self, record):
-        keys_to_features = {
-            'image_raw': tf.FixedLenFeature((), tf.string)
-        }
-        parsed = tf.parse_single_example(record, keys_to_features)
-        image = tf.decode_raw(parsed['image_raw'], tf.uint8)
-        image = tf.reshape(image, self.image_shape)
-        image = tf.cast(image, tf.float32)
-
-        return image
 
     def load_dataset(self, batch_size):
         filenames = os.listdir(self.base_dir)
