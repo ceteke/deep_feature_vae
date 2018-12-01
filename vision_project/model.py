@@ -35,7 +35,8 @@ class Model(object):
         return tf.reduce_mean(tf.square(t1 - t2))
 
     def fit_batch(self):
-        self.sess.run([self.train_op, self.merged], feed_dirct={self.is_train: True})
+        _, summary = self.sess.run([self.train_op, self.merged], feed_dict={self.is_train: True})
+        self.train_writer.add_summary(summary, self.global_step.eval(self.sess))
 
     def build_model(self):
         el1 = self.conv_bn_layer(self.x, 32, 4)
