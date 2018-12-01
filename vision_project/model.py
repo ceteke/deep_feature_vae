@@ -1,11 +1,16 @@
 import tensorflow as tf
+from vision_project.vgg19 import Vgg19
 
 
 class Model(object):
-    def __init__(self, x, learning_rate):
+    def __init__(self, x, vgg_path, learning_rate=5e-4, alpha=1, beta=0.5):
         self.x = x
         self.learning_rate = learning_rate
+        self.vgg_path = vgg_path
+        self.alpha = alpha
+        self.beta = beta
 
+        self.vgg = Vgg19(vgg_path)
         self.global_step = tf.Variable(0, dtype=tf.int32, trainable=False, name='global_step')
         self.is_train = tf.placeholder(tf.bool)
         self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
@@ -18,6 +23,9 @@ class Model(object):
             return tf.layers.batch_normalization(output, training=self.is_train)
         else:
             return output
+
+    def sq_err(self, t1, t2):
+        return tf.reduce_mean(tf.square(t1 - t2))
 
     def build_model(self):
         el1 = self.conv_bn_layer(self.x, 32, 4)
@@ -45,7 +53,15 @@ class Model(object):
         dl4 = tf.image.resize_nearest_neighbor(dl4, size=(64, 64))
         output = self.conv_bn_layer(dl4, 3, 3, 1, False, None)
 
+        vgg_layers = self.vgg(self.x)
+        vgg_layers_hat = self.vgg(output, reuse=True)
+
+        self.perceptual_loss = self.sq_err(vgg_layers[2], vgg_layers_hat[2])
+        self.perceptual_loss += self.sq_err(vgg_layers[3], vgg_layers_hat[3])
+        self.perceptual_loss += self.sq_err(vgg_layers[4], vgg_layers_hat[4])
+        self.perceptual_loss *= 0.5
+
         self.kl_loss = tf.reduce_mean(-0.5*tf.reduce_sum(1+sigma-tf.square(mu)-tf.exp(sigma),1))
-        self.loss = self.kl_loss + 0 # TODO: Perceptual loss
+        self.loss = self.alpha*self.kl_loss + self.beta*self.perceptual_loss
 
         self.train_op = self.optimizer.minimize(self.loss, self.global_step)
