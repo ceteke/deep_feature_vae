@@ -3,7 +3,7 @@ from vision_project.vgg19 import Vgg19
 
 
 class Model(object):
-    def __init__(self, sess, x, vgg_path, num_batches, summary_dir, learning_rate=5e-4, alpha=1, beta=0.5):
+    def __init__(self, sess, x, vgg_path, summary_dir, learning_rate=5e-4, alpha=1, beta=0.5):
         self.x = x
         self.sess = sess
         self.learning_rate = learning_rate
@@ -15,8 +15,7 @@ class Model(object):
         self.global_step = tf.Variable(0, dtype=tf.int32, trainable=False, name='global_step')
         self.is_train = tf.placeholder(tf.bool)
 
-        decay_lr = tf.train.exponential_decay(self.learning_rate, self.global_step, num_batches, 0.5)
-        self.optimizer = tf.train.AdamOptimizer(decay_lr)
+        self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
         self.build_model()
 
         self.merged = tf.summary.merge_all()

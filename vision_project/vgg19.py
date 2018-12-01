@@ -45,7 +45,7 @@ class Vgg19:
             conv5_4 = self.conv_layer(conv5_3, "conv5_4")
             pool5 = self.max_pool(conv5_4, 'pool5')
 
-            return pool1, pool2, pool3, pool4, pool5
+            return conv1_1, conv2_1, conv3_1, conv4_1, conv5_1
 
     def max_pool(self, bottom, name):
         return tf.nn.max_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)

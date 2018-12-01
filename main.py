@@ -11,9 +11,9 @@ iterator = dataset.make_initializable_iterator()
 next_element = iterator.get_next()
 
 sess = tf.Session()
-model = Model(sess, next_element, '/home/cem/vgg19.npy', num_batches, 'logs/run1')
+model = Model(sess, next_element, '/home/cem/vgg19.npy', 'logs/run1')
 
-for e in range(5):
+for e in range(10):
     print("Epoch {}".format(e+1))
     sess.run(iterator.initializer)
     while True:
