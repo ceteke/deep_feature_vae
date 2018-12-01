@@ -3,7 +3,7 @@ from vision_project.vgg19 import Vgg19
 
 
 class Model(object):
-    def __init__(self, x, vgg_path, learning_rate=5e-4, alpha=1, beta=0.5):
+    def __init__(self, x, vgg_path, num_batches, learning_rate=5e-4, alpha=1, beta=0.5):
         self.x = x
         self.learning_rate = learning_rate
         self.vgg_path = vgg_path
@@ -13,7 +13,9 @@ class Model(object):
         self.vgg = Vgg19(vgg_path)
         self.global_step = tf.Variable(0, dtype=tf.int32, trainable=False, name='global_step')
         self.is_train = tf.placeholder(tf.bool)
-        self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
+
+        decay_lr = tf.train.exponential_decay(self.learning_rate, self.global_step, num_batches, 0.5)
+        self.optimizer = tf.train.AdamOptimizer(decay_lr)
         self.build_model()
 
     def conv_bn_layer(self, input, filters, kernel_size, stride=2, bn=True, activation=tf.nn.leaky_relu):

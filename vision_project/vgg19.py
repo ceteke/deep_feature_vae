@@ -77,11 +77,13 @@ class Vgg19:
             return relu
 
     def get_conv_filter(self, name):
-        return tf.get_variable(name='filter',
-                               initializer=tf.constant_initializer(self.data_dict[name][0]),
+        filter = self.data_dict[name][0]
+        return tf.get_variable(name='filter', shape=filter.shape,
+                               initializer=tf.constant_initializer(filter),
                                trainable=False)
 
     def get_bias(self, name):
-        return tf.get_variable(name='bias',
-                               initializer=tf.constant_initializer(self.data_dict[name][0]),
+        bias = self.data_dict[name][1]
+        return tf.get_variable(name='bias', shape=bias.shape,
+                               initializer=tf.constant_initializer(bias),
                                trainable=False)
