@@ -3,8 +3,9 @@ from vision_project.vgg19 import Vgg19
 
 
 class Model(object):
-    def __init__(self, x, vgg_path, num_batches, learning_rate=5e-4, alpha=1, beta=0.5):
+    def __init__(self, sess, x, vgg_path, num_batches, summary_dir, learning_rate=5e-4, alpha=1, beta=0.5):
         self.x = x
+        self.sess = sess
         self.learning_rate = learning_rate
         self.vgg_path = vgg_path
         self.alpha = alpha
@@ -18,6 +19,10 @@ class Model(object):
         self.optimizer = tf.train.AdamOptimizer(decay_lr)
         self.build_model()
 
+        self.merged = tf.summary.merge_all()
+        self.train_writer = tf.summary.FileWriter(summary_dir, self.sess.graph)
+        self.sess.run(tf.global_variables_initializer())
+
     def conv_bn_layer(self, input, filters, kernel_size, stride=2, bn=True, activation=tf.nn.leaky_relu):
         output = tf.layers.conv2d(input, filters=filters, kernel_size=kernel_size, strides=stride,
                                   activation=activation)
@@ -28,6 +33,9 @@ class Model(object):
 
     def sq_err(self, t1, t2):
         return tf.reduce_mean(tf.square(t1 - t2))
+
+    def fit_batch(self):
+        self.sess.run([self.train_op, self.merged], feed_dirct={self.is_train: True})
 
     def build_model(self):
         el1 = self.conv_bn_layer(self.x, 32, 4)
@@ -62,8 +70,12 @@ class Model(object):
         self.perceptual_loss += self.sq_err(vgg_layers[3], vgg_layers_hat[3])
         self.perceptual_loss += self.sq_err(vgg_layers[4], vgg_layers_hat[4])
         self.perceptual_loss *= 0.5
+        tf.summary.scalar('perceptual_loss', self.perceptual_loss)
 
         self.kl_loss = tf.reduce_mean(-0.5*tf.reduce_sum(1+sigma-tf.square(mu)-tf.exp(sigma),1))
+        tf.summary.scalar('kl_loss', self.kl_loss)
+
         self.loss = self.alpha*self.kl_loss + self.beta*self.perceptual_loss
+        tf.summary.scalar('loss', self.loss)
 
         self.train_op = self.optimizer.minimize(self.loss, self.global_step)

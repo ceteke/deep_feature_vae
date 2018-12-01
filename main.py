@@ -10,15 +10,13 @@ dataset, num_batches = dl.load_dataset(64)
 iterator = dataset.make_initializable_iterator()
 next_element = iterator.get_next()
 
-model = Model(next_element, '/home/cem/vgg19.npy', num_batches)
-
 sess = tf.Session()
-sess.run(tf.global_variables_initializer())
+model = Model(sess, next_element, '/home/cem/vgg19.npy', num_batches, 'logs/run1')
 
 for e in range(5):
     sess.run(iterator.initializer)
     while True:
         try:
-            sess.run(model.train_op, feed_dict={model.is_train: True})
+            model.fit_batch()
         except tf.errors.OutOfRangeError:
             break

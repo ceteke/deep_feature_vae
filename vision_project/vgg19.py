@@ -1,31 +1,17 @@
 # Taken from: https://github.com/machrisaa/tensorflow-vgg/blob/master/vgg19.py
 
-import inspect, os, numpy as np, tensorflow as tf
+import numpy as np, tensorflow as tf
 
 VGG_MEAN = [103.939, 116.779, 123.68]
 
 class Vgg19:
-    def __init__(self, vgg16_npy_path=None):
-        if vgg16_npy_path is None:
-            path = inspect.getfile(Vgg16)
-            path = os.path.abspath(os.path.join(path, os.pardir))
-            path = os.path.join(path, "vgg16.npy")
-            vgg16_npy_path = path
-            print(path)
-
+    def __init__(self, vgg16_npy_path):
         self.data_dict = np.load(vgg16_npy_path, encoding='latin1').item()
-        print("npy file loaded")
 
     def __call__(self, rgb, reuse=False):
-        """
-        load variable from npy to build the VGG
-        :param rgb: rgb image [batch, height, width, 3] values scaled [0, 1]
-        """
-
         with tf.variable_scope('vgg', reuse=reuse):
             rgb_scaled = rgb * 255.0
 
-            # Convert RGB to BGR
             red, green, blue = tf.split(axis=3, num_or_size_splits=3, value=rgb_scaled)
             bgr = tf.concat(axis=3, values=[
                 blue - VGG_MEAN[0],
