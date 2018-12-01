@@ -64,6 +64,8 @@ class Model(object):
         dl4 = tf.image.resize_nearest_neighbor(dl4, size=(64, 64))
         output = self.conv_bn_layer(dl4, 3, 3, 1, False, None)
 
+        tf.summary.image('generated', output, 6)
+
         vgg_layers = self.vgg(self.x)
         vgg_layers_hat = self.vgg(output, reuse=True)
 
