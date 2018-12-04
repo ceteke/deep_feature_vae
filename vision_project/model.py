@@ -61,9 +61,10 @@ class Model(object):
         dl3 = tf.image.resize_nearest_neighbor(dl3, size=(32, 32))
         dl4 = self.conv_bn_layer(dl3, 32, 3, 1)
         dl4 = tf.image.resize_nearest_neighbor(dl4, size=(64, 64))
-        output = self.conv_bn_layer(dl4, 3, 3, 1, False, None)
+        output = tf.nn.sigmoid(self.conv_bn_layer(dl4, 3, 3, 1, False, None))
 
         tf.summary.image('generated', output, 6)
+        tf.summary.image('actual', self.x, 6)
 
         vgg_layers = self.vgg(self.x)
         vgg_layers_hat = self.vgg(output, reuse=True)
