@@ -24,7 +24,7 @@ class Model(object):
 
     def conv_bn_layer(self, input, filters, kernel_size, stride=2, bn=True, activation=tf.nn.leaky_relu):
         output = tf.layers.conv2d(input, filters=filters, kernel_size=kernel_size, strides=stride,
-                                  activation=activation)
+                                  activation=activation, padding='same')
         if bn:
             return tf.layers.batch_normalization(output, training=self.is_train)
         else:
@@ -61,13 +61,13 @@ class Model(object):
         dl3 = tf.image.resize_nearest_neighbor(dl3, size=(32, 32))
         dl4 = self.conv_bn_layer(dl3, 32, 3, 1)
         dl4 = tf.image.resize_nearest_neighbor(dl4, size=(64, 64))
-        output = tf.nn.sigmoid(self.conv_bn_layer(dl4, 3, 3, 1, False, None))
+        self.output = self.conv_bn_layer(dl4, 3, 3, 1, False, None)
 
-        tf.summary.image('generated', output, 6)
+        tf.summary.image('generated', self.output, 6)
         tf.summary.image('actual', self.x, 6)
 
         vgg_layers = self.vgg(self.x)
-        vgg_layers_hat = self.vgg(output, reuse=True)
+        vgg_layers_hat = self.vgg(self.output, reuse=True)
 
         self.perceptual_loss = self.sq_err(vgg_layers[2], vgg_layers_hat[2])
         self.perceptual_loss += self.sq_err(vgg_layers[3], vgg_layers_hat[3])
@@ -82,3 +82,7 @@ class Model(object):
         tf.summary.scalar('loss', self.loss)
 
         self.train_op = self.optimizer.minimize(self.loss, self.global_step)
+
+    def reconstruct(self):
+        return self.sess.run(self.output, feed_dict={self.is_train: False})
+

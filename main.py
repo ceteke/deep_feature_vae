@@ -4,6 +4,7 @@ import tensorflow as tf, os
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
+# For training
 dl = DataLoader('/home/cem/img_align_celeba')
 
 dataset, num_batches = dl.load_dataset(64)
@@ -13,7 +14,7 @@ next_element = iterator.get_next()
 sess = tf.Session()
 model = Model(sess, next_element, '/home/cem/vgg19.npy', 'logs/run1')
 
-for e in range(10):
+for e in range(5):
     print("Epoch {}".format(e+1))
     sess.run(iterator.initializer)
     while True:
@@ -21,3 +22,15 @@ for e in range(10):
             model.fit_batch()
         except tf.errors.OutOfRangeError:
             break
+
+# For testing
+dl = DataLoader('/home/cem/img_align_celeba')
+
+dataset, num_batches = dl.load_dataset(100)
+iterator = dataset.make_initializable_iterator()
+next_element = iterator.get_next()
+
+
+sess = tf.Session()
+model = Model(sess, next_element, '/home/cem/vgg19.npy', 'logs/run1')
+
