@@ -1,4 +1,4 @@
-import tensorflow as tf
+import tensorflow as tf, os, shutil
 from vision_project.vgg19 import Vgg19
 
 
@@ -17,8 +17,10 @@ class Model(object):
 
         self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
         self.build_model()
+        self.saver = tf.train.Saver()
 
         self.merged = tf.summary.merge_all()
+        self.model_dir = os.path.join(summary_dir, 'model')
         self.train_writer = tf.summary.FileWriter(summary_dir, self.sess.graph)
         self.sess.run(tf.global_variables_initializer())
 
@@ -86,3 +88,10 @@ class Model(object):
     def reconstruct(self):
         return self.sess.run(self.output, feed_dict={self.is_train: False})
 
+    def save(self):
+        self.saver.save(self.sess, os.path.join(self.model_dir))
+
+    def load(self):
+        ckpt_path = os.path.dirname(os.path.join(self.model_dir))
+        ckpt = tf.train.get_checkpoint_state(ckpt_path)
+        self.saver.restore(self.sess, ckpt.model_checkpoint_path)
