@@ -26,4 +26,3 @@ for e in range(5):
             break
 
 model.save()
-

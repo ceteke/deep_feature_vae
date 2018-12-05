@@ -3,40 +3,44 @@ from vision_project.vgg19 import Vgg19
 
 
 class Model(object):
-    def __init__(self, sess, x, vgg_path, summary_dir, learning_rate=5e-4, alpha=1, beta=0.5):
+    def __init__(self, sess, x, vgg_path, summary_dir, inference=False, learning_rate=5e-4, alpha=1, beta=0.5):
         self.x = x
         self.sess = sess
         self.learning_rate = learning_rate
         self.vgg_path = vgg_path
         self.alpha = alpha
         self.beta = beta
+        self.inference = inference
+        self.summary_dir = summary_dir
 
         self.vgg = Vgg19(vgg_path)
         self.global_step = tf.Variable(0, dtype=tf.int32, trainable=False, name='global_step')
-        self.is_train = tf.placeholder(tf.bool)
 
         self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
         self.build_model()
+        self.model_dir = os.path.join(summary_dir, 'model.ckpt')
+
         self.saver = tf.train.Saver()
 
-        self.merged = tf.summary.merge_all()
-        self.model_dir = os.path.join(summary_dir, 'model')
-        self.train_writer = tf.summary.FileWriter(summary_dir, self.sess.graph)
-        self.sess.run(tf.global_variables_initializer())
+        if not inference:
+            self.merged = tf.summary.merge_all()
+            self.train_writer = tf.summary.FileWriter(summary_dir, self.sess.graph)
+
+            self.sess.run(tf.global_variables_initializer())
 
     def conv_bn_layer(self, input, filters, kernel_size, stride=2, bn=True, activation=tf.nn.leaky_relu):
         output = tf.layers.conv2d(input, filters=filters, kernel_size=kernel_size, strides=stride,
                                   activation=activation, padding='same')
         if bn:
-            return tf.layers.batch_normalization(output, training=self.is_train)
-        else:
-            return output
+            output = tf.layers.batch_normalization(output, training=True)
+
+        return output
 
     def sq_err(self, t1, t2):
         return tf.reduce_mean(tf.square(t1 - t2))
 
     def fit_batch(self):
-        _, summary = self.sess.run([self.train_op, self.merged], feed_dict={self.is_train: True})
+        _, summary = self.sess.run([self.train_op, self.merged])
         self.train_writer.add_summary(summary, self.global_step.eval(self.sess))
 
     def build_model(self):
@@ -86,12 +90,10 @@ class Model(object):
         self.train_op = self.optimizer.minimize(self.loss, self.global_step)
 
     def reconstruct(self):
-        return self.sess.run(self.output, feed_dict={self.is_train: False})
+        return self.sess.run([self.x, self.output])
 
     def save(self):
-        self.saver.save(self.sess, os.path.join(self.model_dir))
+        self.saver.save(self.sess, self.model_dir)
 
     def load(self):
-        ckpt_path = os.path.dirname(os.path.join(self.model_dir))
-        ckpt = tf.train.get_checkpoint_state(ckpt_path)
-        self.saver.restore(self.sess, ckpt.model_checkpoint_path)
+        self.saver.restore(self.sess, self.model_dir)

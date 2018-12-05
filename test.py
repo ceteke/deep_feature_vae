@@ -1,7 +1,7 @@
 from vision_project.data_loader import DataLoader
 from vision_project.model import Model
-from vision_project.utils import build_grid_img
-import tensorflow as tf, os, scipy.misc
+from vision_project.utils import save_grid_img
+import tensorflow as tf, os
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 experiment_name = 'logs/run1'
@@ -15,10 +15,13 @@ next_element = iterator.get_next()
 
 sess = tf.Session()
 
-model = Model(sess, next_element, '/home/cem/vgg19.npy', experiment_name)
+model = Model(sess, next_element, '/home/cem/vgg19.npy', experiment_name, inference=True)
 model.load()
 
-reconstructed_images = model.reconstruct()
-grid_img = build_grid_img(reconstructed_images, 64, 64, 10, 10)
+original_image, reconstructed_images = model.reconstruct()
+
 im_dir = os.path.join(experiment_name, 'output.jpg')
-scipy.misc.imsave(im_dir, grid_img)
+save_grid_img(reconstructed_images, im_dir, 64, 64, 10, 10)
+
+org_dir = os.path.join(experiment_name, 'original.jpg')
+save_grid_img(original_image, org_dir, 64, 64, 10, 10)
