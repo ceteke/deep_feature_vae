@@ -1,10 +1,13 @@
 from vision_project.data_loader import DataLoader
 from vision_project.model import Model
 from vision_project.utils import save_grid_img
-import tensorflow as tf, os
+import tensorflow as tf, os, numpy as np
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 experiment_name = 'logs/run1'
+
+IMG_MEAN = np.array([134.10714722, 102.52040863, 87.15436554])
+IMG_STDDEV = np.sqrt(np.array([3941.30175781, 2856.94287109, 2519.35791016]))
 
 dl = DataLoader('/home/cem/img_align_celeba')
 
@@ -20,13 +23,14 @@ model.load()
 
 original_image, reconstructed_images = model.reconstruct()
 
+ran_img = model.generate(100)
+
 im_dir = os.path.join(experiment_name, 'output.jpg')
 save_grid_img(reconstructed_images, im_dir, 64, 64, 10, 10)
 
 org_dir = os.path.join(experiment_name, 'original.jpg')
 save_grid_img(original_image, org_dir, 64, 64, 10, 10)
 
-ran_img = model.generate(100)
 ran_dir = os.path.join(experiment_name, 'rand.jpg')
 save_grid_img(ran_img, ran_dir, 64, 64, 10, 10)
 

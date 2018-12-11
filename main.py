@@ -10,7 +10,7 @@ experiment_name = 'logs/run1'
 # For training
 dl = DataLoader('/home/cem/img_align_celeba')
 
-dataset, num_batches = dl.load_dataset(64)
+dataset, num_batches = dl.load_dataset(32)
 iterator = dataset.make_initializable_iterator()
 next_element = iterator.get_next()
 

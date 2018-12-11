@@ -1,4 +1,4 @@
-import tensorflow as tf, os, shutil
+import tensorflow as tf, os, numpy as np
 from vision_project.vgg19 import Vgg19
 
 
@@ -75,6 +75,7 @@ class Model(object):
             return self.conv_bn_layer(dl4, 3, 3, 1, False, None)
 
     def build_model(self):
+        # Training graph
         self.z, self.mu, self.sigma = self.encoder(self.x)
         self.output = self.decoder(self.z)
 
@@ -98,16 +99,28 @@ class Model(object):
 
         self.train_op = self.optimizer.minimize(self.loss, self.global_step)
 
+        # Sampling Graph
         self.num_sample = tf.placeholder(tf.int32)
         self.random_latent = tf.random_normal((self.num_sample, 100))
         self.ran_img = self.decoder(self.random_latent, reuse=True)
 
+        # Decoding Graph
+        self.latent = tf.placeholder(tf.float32, shape=[None, 100])
+        self.generated = self.decoder(self.latent, reuse=True)
+
     def generate(self, n):
-        return self.sess.run(self.ran_img,
+        rand = self.sess.run(self.ran_img,
                              feed_dict={self.num_sample: n})
+        return np.clip(rand, 0., 1.).astype('float32')
+
+    def decode(self, z):
+        decoded = self.sess.run(self.generated,
+                                feed_dict={self.latent: z})
+        return np.clip(decoded, 0., 1.).astype('float32')
 
     def reconstruct(self):
-        return self.sess.run([self.x, self.output])
+        x, gen =  self.sess.run([self.x, self.output])
+        return x, np.clip(gen,0., 1.).astype('float32')
 
     def save(self):
         self.saver.save(self.sess, self.model_dir)
