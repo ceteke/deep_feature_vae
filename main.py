@@ -1,6 +1,7 @@
 from vision_project.data_loader import DataLoader
 from vision_project.model import Model
 import tensorflow as tf, os
+from tqdm import tqdm
 
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
@@ -16,13 +17,10 @@ next_element = iterator.get_next()
 sess = tf.Session()
 model = Model(sess, next_element, '/home/cem/vgg19.npy', experiment_name)
 
-for e in range(5):
+for e in range(10):
     print("Epoch {}".format(e+1))
     sess.run(iterator.initializer)
-    while True:
-        try:
-            model.fit_batch()
-        except tf.errors.OutOfRangeError:
-            break
+    for _ in tqdm(range(num_batches)):
+        model.fit_batch()
 
 model.save()

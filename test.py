@@ -25,3 +25,8 @@ save_grid_img(reconstructed_images, im_dir, 64, 64, 10, 10)
 
 org_dir = os.path.join(experiment_name, 'original.jpg')
 save_grid_img(original_image, org_dir, 64, 64, 10, 10)
+
+ran_img = model.generate(100)
+ran_dir = os.path.join(experiment_name, 'rand.jpg')
+save_grid_img(ran_img, ran_dir, 64, 64, 10, 10)
+
