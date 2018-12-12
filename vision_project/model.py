@@ -108,15 +108,27 @@ class Model(object):
         self.latent = tf.placeholder(tf.float32, shape=[None, 100])
         self.generated = self.decoder(self.latent, reuse=True)
 
+        # Encoding Graph
+        self.inp = tf.placeholder(tf.float32, shape=[None, 64, 64, 3])
+        self.z_pl, _, _ = self.encoder(self.inp, reuse=True)
+
     def generate(self, n):
         rand = self.sess.run(self.ran_img,
                              feed_dict={self.num_sample: n})
         return np.clip(rand, 0., 1.).astype('float32')
 
     def decode(self, z):
+        if len(z) < 2:
+            z = z.reshape(1, -1)
         decoded = self.sess.run(self.generated,
                                 feed_dict={self.latent: z})
         return np.clip(decoded, 0., 1.).astype('float32')
+
+    def encode(self, inp):
+        if len(inp.shape) < 4:
+            inp = inp.reshape(1, 64, 64, 3)
+        return self.sess.run(self.z_pl,
+                             feed_dict={self.inp: inp})
 
     def reconstruct(self):
         x, gen =  self.sess.run([self.x, self.output])
@@ -127,3 +139,16 @@ class Model(object):
 
     def load(self):
         self.saver.restore(self.sess, self.model_dir)
+
+    def interpolate(self, img1, img2, n=10):
+        z1 = self.encode(img1)
+        z2 = self.encode(img2)
+
+        interpolated = []
+
+        for i in range(n+2):
+            alpha = i/float(n+1)
+            z = (1-alpha)*z1 + alpha*z2
+            interpolated.append(self.decode(z).squeeze())
+
+        return np.array(interpolated)
