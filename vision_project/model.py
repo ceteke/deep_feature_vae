@@ -130,6 +130,9 @@ class Model(object):
         return self.sess.run(self.z_pl,
                              feed_dict={self.inp: inp})
 
+    def get_latent(self):
+        return self.sess.run(self.z)
+
     def reconstruct(self):
         x, gen =  self.sess.run([self.x, self.output])
         return x, np.clip(gen,0., 1.).astype('float32')

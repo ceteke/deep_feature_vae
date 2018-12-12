@@ -1,8 +1,31 @@
-import os, tensorflow as tf, math
+import os, tensorflow as tf, math, pandas as pd
+
+class AttributeLoader(object):
+    def __init__(self, dir):
+        self.dir = dir
+        self.attribute_df = pd.read_csv(dir)
+
+    def get_ids(self, attribute):
+        if attribute[0] == '~':
+            val = -1
+            attribute = attribute[1:]
+        else:
+            val = 1
+        return self.attribute_df.loc[self.attribute_df[attribute] == val]['image_id'].values
+
+    def get_ids_iterator(self, data_dir, attribute, n=1000):
+        imgs = self.get_ids(attribute)
+
+        eyeglass_dl = DataLoader(data_dir, imgs)
+
+        dataset, num_batches = eyeglass_dl.load_dataset(n)
+        iterator = dataset.make_one_shot_iterator()
+        return iterator.get_next()
 
 class DataLoader(object):
-    def __init__(self, base_dir):
+    def __init__(self, base_dir, filenames=None):
         self.base_dir = base_dir
+        self.filenames = filenames
 
     def crop_center_image(self, img):
         width_start = tf.cast(tf.shape(img)[1] / 2 - 150 / 2, tf.int32)
@@ -11,7 +34,10 @@ class DataLoader(object):
         return cropped_img
 
     def load_dataset(self, batch_size):
-        filenames = os.listdir(self.base_dir)
+        if self.filenames is None:
+            filenames = os.listdir(self.base_dir)
+        else:
+            filenames = self.filenames
         dirs = list(map(lambda x: os.path.join(self.base_dir, x), filenames))
         num_batches = math.ceil(len(dirs)/batch_size)
 

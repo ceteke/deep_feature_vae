@@ -6,9 +6,6 @@ import tensorflow as tf, os, numpy as np
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 experiment_name = 'logs/run1'
 
-IMG_MEAN = np.array([134.10714722, 102.52040863, 87.15436554])
-IMG_STDDEV = np.sqrt(np.array([3941.30175781, 2856.94287109, 2519.35791016]))
-
 dl = DataLoader('/home/cem/img_align_celeba')
 
 dataset, num_batches = dl.load_dataset(100)
