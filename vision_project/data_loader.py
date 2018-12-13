@@ -20,7 +20,7 @@ class AttributeLoader(object):
 
         dataset, num_batches = eyeglass_dl.load_dataset(n)
         iterator = dataset.make_one_shot_iterator()
-        return iterator.get_next()
+        return iterator.get_next(), num_batches, len(imgs)
 
 class DataLoader(object):
     def __init__(self, base_dir, filenames=None):

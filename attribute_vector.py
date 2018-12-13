@@ -4,13 +4,13 @@ import tensorflow as tf, os, numpy as np, pickle
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-attribute_name = 'Eyeglasses'
+attribute_name = 'Mustache'
 
 data_dir = '/home/cem/img_align_celeba'
 experiment_name = 'logs/run1'
 
 al = AttributeLoader('/home/cem/list_attr_celeba.csv')
-next_element = al.get_ids_iterator(data_dir, attribute_name)
+next_element, _, _ = al.get_ids_iterator(data_dir, attribute_name)
 
 sess = tf.Session()
 model = Model(sess, next_element, '/home/cem/vgg19.npy', experiment_name)
@@ -23,7 +23,7 @@ attribute_latent = np.mean(attribute_latent, axis=0)
 tf.reset_default_graph()
 
 al = AttributeLoader('/home/cem/list_attr_celeba.csv')
-next_element = al.get_ids_iterator(data_dir, '~'+attribute_name)
+next_element, _, _ = al.get_ids_iterator(data_dir, '~'+attribute_name)
 
 sess = tf.Session()
 model = Model(sess, next_element, '/home/cem/vgg19.npy', experiment_name)
