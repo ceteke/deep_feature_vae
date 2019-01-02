@@ -2,6 +2,10 @@ import os, tensorflow as tf, math, pandas as pd
 
 class AttributeLoader(object):
     def __init__(self, dir):
+        '''
+        
+        :param dir: Dataset directory
+        '''
         self.dir = dir
         self.attribute_df = pd.read_csv(dir)
 

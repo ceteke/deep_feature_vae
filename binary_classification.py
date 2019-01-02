@@ -4,10 +4,11 @@ import tensorflow as tf, os, numpy as np
 from tqdm import tqdm
 from sklearn.svm import LinearSVC
 from sklearn.model_selection import train_test_split
+from sklearn.decomposition import PCA
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-attribute_name = 'Mustache'
+attribute_name = 'Mouth_Slightly_Open'
 attribute_latent = []
 attribute_label = []
 

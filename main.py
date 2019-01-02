@@ -4,8 +4,8 @@ import tensorflow as tf, os
 from tqdm import tqdm
 
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-experiment_name = 'logs/run1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '0' # Which GPU to use?
+experiment_name = 'logs/run1' # Log directory
 
 # For training
 dl = DataLoader('/home/cem/img_align_celeba')

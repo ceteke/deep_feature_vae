@@ -17,7 +17,7 @@ sess = tf.Session()
 model = Model(sess, next_element, '/home/cem/vgg19.npy', experiment_name, inference=True)
 model.load()
 
-file_dir = os.path.join(experiment_name, 'Smiling_vec.pk')
+file_dir = os.path.join(experiment_name, 'Eyeglasses_vec.pk')
 vector = pickle.load(open(file_dir, 'rb'))
 
 changes = []
