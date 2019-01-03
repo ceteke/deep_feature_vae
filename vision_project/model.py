@@ -111,6 +111,10 @@ class Model(object):
         # Encoding Graph
         self.inp = tf.placeholder(tf.float32, shape=[None, 64, 64, 3])
         self.z_pl, _, _ = self.encoder(self.inp, reuse=True)
+        print(self.inp)
+        print(self.z_pl)
+        print(self.latent)
+        print(self.generated)
 
     def generate(self, n):
         rand = self.sess.run(self.ran_img,

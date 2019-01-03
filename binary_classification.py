@@ -5,10 +5,11 @@ from tqdm import tqdm
 from sklearn.svm import LinearSVC
 from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA
+import pickle
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
-attribute_name = 'Mouth_Slightly_Open'
+attribute_name = 'Big_Nose'
 attribute_latent = []
 attribute_label = []
 
@@ -56,3 +57,5 @@ svm = LinearSVC()
 svm.fit(train_latent, train_label)
 acc = svm.score(test_latent, test_label)
 print("Accuracy for {} is {}".format(attribute_name, acc))
+
+pickle.dump(svm, open('{}_svm.pk'.format(attribute_name), 'wb'))
