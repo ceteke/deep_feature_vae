@@ -3,7 +3,7 @@ import os, tensorflow as tf, numpy as np
 from vision_project.data_loader import DataLoader
 from vision_project.utils import save_grid_img
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 experiment_name = 'logs/run1'
 
 dl = DataLoader('/home/cem/img_align_celeba')
@@ -23,10 +23,10 @@ for i in range(6):
     img1 = batch[i]
     img2 = batch[i+1]
 
-    imgs.append(model.interpolate(img1, img2))
+    imgs.append(np.concatenate([[img1], model.interpolate(img1, img2), [img2]]))
 
 imgs = np.concatenate(imgs)
 print(imgs.shape)
 
 int_path = os.path.join(experiment_name, 'interpolate.jpg')
-save_grid_img(imgs, int_path, 64, 64, 6, 12)
+save_grid_img(imgs, int_path, 64, 64, 6, 14)

@@ -1,6 +1,7 @@
 from vision_project.data_loader import AttributeLoader
 from vision_project.model import Model
 import tensorflow as tf, os, numpy as np, pickle
+from utils import load_img
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 

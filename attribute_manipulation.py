@@ -2,8 +2,9 @@ from vision_project.data_loader import DataLoader
 from vision_project.model import Model
 from vision_project.utils import save_grid_img
 import tensorflow as tf, os, numpy as np, pickle
+from utils import load_img
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 experiment_name = 'logs/run1'
 
 dl = DataLoader('/home/cem/img_align_celeba')
@@ -22,10 +23,13 @@ vector = pickle.load(open(file_dir, 'rb'))
 
 changes = []
 batch = sess.run(next_element)
-img = batch[0]
+#img = batch[0]
+
+img = load_img('/home/cem/yyemez.jpg')
 
 latent = model.encode(img)
 
+changes.append(img)
 for i in range(10):
     alpha = i/float(9)
     latent_int = latent + alpha*vector*3

@@ -3,7 +3,7 @@ from vision_project.model import Model
 from vision_project.utils import save_grid_img
 import tensorflow as tf, os, numpy as np
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 experiment_name = 'logs/run1'
 
 dl = DataLoader('/home/cem/img_align_celeba')
